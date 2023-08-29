@@ -36,14 +36,14 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
     private  float minZoom = 1;
     private float zoom = minZoom; //缩放比例  不得小于1
     private int translateX; //以左上角为准，X轴位移的距离
-    private int translateY;//以左上角为准，y轴位移的距离
+    public int translateY;//以左上角为准，y轴位移的距离
     private ScaleGestureDetector mScaleGestureDetector;
-    private GestureDetector mGestureDetector;
+    protected GestureDetector mGestureDetector;
     private boolean isCanZoom = false;
     private boolean isScale; //是否正在缩小
-    private Rect originalRect; //原始大小
-    private Rect zoomRect;
-    private float mDownX, mDownY;
+    protected Rect originalRect; //原始大小
+    protected Rect zoomRect;
+    protected float mDownX, mDownY;
     private int pointMode; //屏幕的手指点个数
     private Scroller scroller;
     private int mMinimumVelocity;
@@ -83,6 +83,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
         return true;
     }
 
+    boolean isDragging=false;
 
 
     /**
@@ -98,6 +99,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
         }
         switch (event.getAction()&MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                isDragging= false;
                 pointMode = 1;
                 //ACTION_DOWN的时候，赶紧把事件hold住
                 mDownX = event.getX();
@@ -131,7 +133,10 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
                         isDisallowIntercept = false;
                     }
                 }
-                parent.requestDisallowInterceptTouchEvent(isDisallowIntercept);
+                if(isDisallowIntercept){
+                    isDragging= true;
+                }
+                parent.requestDisallowInterceptTouchEvent(isDisallowIntercept||isDragging);
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 pointMode -= 1;
@@ -139,6 +144,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 pointMode = 0;
+                isDragging= false;
                 parent.requestDisallowInterceptTouchEvent(false);
         }
 
@@ -164,7 +170,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
      * 通过translateY值判断是否到底部边界
      * @return 是否到底部边界
      */
-    private boolean toRectBottom() {
+    protected boolean toRectBottom() {
         int height = zoomRect.height() -originalRect.height();
         return translateY>= height;
     }
@@ -172,7 +178,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
      * 通过translateY值判断是否到顶部边界
      * @return 是否到顶部边界
      */
-    private boolean toRectTop() {
+    protected boolean toRectTop() {
         return translateY <= 0;
     }
 
@@ -211,7 +217,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
     /**
      * 手势监听
      */
-    class OnTableGestureListener extends GestureDetector.SimpleOnGestureListener {
+    protected class OnTableGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public void onLongPress(MotionEvent e) {
@@ -221,7 +227,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if(onInterceptListener ==null || !onInterceptListener.isIntercept(e1,distanceX,distanceY)){
-
+Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
                 translateX += distanceX;
                 translateY += distanceY;
                 notifyViewChanged();

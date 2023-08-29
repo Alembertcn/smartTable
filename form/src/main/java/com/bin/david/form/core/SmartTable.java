@@ -41,9 +41,9 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     private XSequence<T> xAxis;
     private YSequence<T> yAxis;
     private ITableTitle tableTitle;
-    private TableProvider<T> provider;
-    private Rect showRect;
-    private Rect tableRect;
+    protected TableProvider<T> provider;
+    protected Rect showRect;
+    protected Rect tableRect;
     private TableConfig config;
     private TableParser<T> parser;
     private TableData<T> tableData;
@@ -52,9 +52,9 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     private TableMeasurer<T> measurer;
     private AnnotationParser<T> annotationParser;
     protected Paint paint;
-    private MatrixHelper matrixHelper;
+    protected MatrixHelper matrixHelper;
     private boolean isExactly = true; //是否是测量精准模式
-    private AtomicBoolean isNotifying = new AtomicBoolean(false); //是否正在更新数据
+    protected AtomicBoolean isNotifying = new AtomicBoolean(false); //是否正在更新数据
     private boolean isYSequenceRight;
 
 
@@ -76,7 +76,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     /**
      * 初始化
      */
-    private void init() {
+    protected void init() {
         FontStyle.setDefaultTextSpSize(getContext(), 13);
         config = new TableConfig();
         config.dp10 = DensityUtils.dp2px(getContext(), 10);
@@ -91,11 +91,15 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         measurer = new TableMeasurer<>();
         tableTitle = new TableTitle();
         tableTitle.setDirection(IComponent.TOP);
-        matrixHelper = new MatrixHelper(getContext());
+        matrixHelper = createMatrixHelper();
         matrixHelper.setOnTableChangeListener(this);
         matrixHelper.register(provider);
         matrixHelper.setOnInterceptListener(provider.getOperation());
 
+    }
+
+    protected MatrixHelper createMatrixHelper() {
+        return new MatrixHelper(getContext());
     }
 
     /**
@@ -112,9 +116,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     protected void onDraw(Canvas canvas) {
         if (!isNotifying.get()) {
             setScrollY(0);
-            showRect.set(getPaddingLeft(), getPaddingTop(),
-                    getWidth() - getPaddingRight(),
-                    getHeight() - getPaddingBottom());
+            initShowRect();
             if (tableData != null) {
                 Rect rect = tableData.getTableInfo().getTableRect();
                 if (rect != null) {
@@ -155,6 +157,12 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                 }
             }
         }
+    }
+
+    protected void initShowRect() {
+        showRect.set(getPaddingLeft(), getPaddingTop(),
+                getWidth() - getPaddingRight(),
+                2000 - getPaddingBottom());
     }
 
     /**
