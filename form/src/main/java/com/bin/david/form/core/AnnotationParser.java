@@ -1,6 +1,8 @@
 package com.bin.david.form.core;
 
 
+import android.content.Context;
+
 import com.bin.david.form.annotation.*;
 import com.bin.david.form.data.column.ArrayColumn;
 import com.bin.david.form.data.column.Column;
@@ -24,6 +26,7 @@ import java.util.Map;
 
 public class AnnotationParser<T>  {
 
+    private final Context mContext;
     private int dp10;
     /**
      * 解析注解
@@ -98,6 +101,9 @@ public class AnnotationParser<T>  {
      */
     private void createColumn(String fieldName,Field field, List<Column> columns, Map<String, Column> parentMap, boolean isArray,boolean isThoroughArray, SmartColumn smartColumn) {
         String name = smartColumn.name();
+        if(smartColumn.nameRes()!=-1 && mContext!=null){
+            name = mContext.getResources().getString(smartColumn.nameRes());
+        }
         int id = smartColumn.id();
         String parent = smartColumn.parent();
         boolean isAutoCount = smartColumn.autoCount();
@@ -177,7 +183,8 @@ public class AnnotationParser<T>  {
         return column;
     }
 
-    public AnnotationParser(int dp10) {
+    public AnnotationParser(int dp10, Context context) {
         this.dp10 = dp10;
+        this.mContext = context;
     }
 }

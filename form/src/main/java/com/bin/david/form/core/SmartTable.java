@@ -197,7 +197,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      */
     public PageTableData<T> setData(List<T> data) {
         if (annotationParser == null) {
-            annotationParser = new AnnotationParser<>(config.dp10);
+            annotationParser = new AnnotationParser<>(config.dp10,getContext());
         }
         PageTableData<T> tableData = annotationParser.parse(data);
         if (tableData != null) {

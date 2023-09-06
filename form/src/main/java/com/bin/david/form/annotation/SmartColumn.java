@@ -21,6 +21,11 @@ public @interface SmartColumn {
     String name() default "";
 
     /**
+     * 名称
+     */
+   int nameRes() default -1;
+
+    /**
      * id 越小越在前面
      */
     int id() default 0;

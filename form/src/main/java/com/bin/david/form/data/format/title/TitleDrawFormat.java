@@ -46,7 +46,7 @@ public class TitleDrawFormat implements ITitleDrawFormat {
         drawText(c, column, rect, paint);
     }
 
-    private void drawText(Canvas c, Column column, Rect rect, Paint paint) {
+    protected void drawText(Canvas c, Column column, Rect rect, Paint paint) {
         if(column.getTitleAlign() !=null) { //如果列设置Align ，则使用列的Align
             paint.setTextAlign(column.getTitleAlign());
         }
