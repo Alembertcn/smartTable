@@ -35,8 +35,8 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
     private  float maxZoom = 5;
     private  float minZoom = 1;
     private float zoom = minZoom; //缩放比例  不得小于1
-    private int translateX; //以左上角为准，X轴位移的距离
-    public int translateY;//以左上角为准，y轴位移的距离
+    protected int translateX; //以左上角为准，X轴位移的距离
+    protected int translateY;//以左上角为准，y轴位移的距离
     private ScaleGestureDetector mScaleGestureDetector;
     protected GestureDetector mGestureDetector;
     private boolean isCanZoom = false;
@@ -514,8 +514,25 @@ Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
     public boolean isCanZoom() {
         zoom = 1f;
         return isCanZoom;
-
     }
+
+
+    public int getTranslateX() {
+        return translateX;
+    }
+
+    public void setTranslateX(int translateX) {
+        this.translateX = translateX;
+    }
+
+    public int getTranslateY() {
+        return translateY;
+    }
+
+    public void setTranslateY(int translateY) {
+        this.translateY = translateY;
+    }
+
     /**
      * 获取表格改变监听
      * 主要用于SmartTable view监听matrixHelper 移动和缩放

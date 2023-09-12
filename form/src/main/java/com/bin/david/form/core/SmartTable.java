@@ -46,14 +46,14 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     protected Rect tableRect;
     private TableConfig config;
     private TableParser<T> parser;
-    private TableData<T> tableData;
-    private int defaultHeight = 300;
-    private int defaultWidth = 300;
+    protected TableData<T> tableData;
+    protected int defaultHeight = 300;
+    protected int defaultWidth = 300;
     private TableMeasurer<T> measurer;
     private AnnotationParser<T> annotationParser;
     protected Paint paint;
     protected MatrixHelper matrixHelper;
-    private boolean isExactly = true; //是否是测量精准模式
+    protected boolean isExactly = true; //是否是测量精准模式
     protected AtomicBoolean isNotifying = new AtomicBoolean(false); //是否正在更新数据
     private boolean isYSequenceRight;
 
@@ -124,6 +124,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                         measurer.measureTableTitle(tableData, tableTitle, showRect);
                     }
                     tableRect.set(rect);
+                    onPreDraw();
                     Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,
                             tableData.getTableInfo());
                     if (config.isShowTableTitle()) {
@@ -157,6 +158,9 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                 }
             }
         }
+    }
+
+    protected void onPreDraw() {
     }
 
     protected void initShowRect() {
@@ -242,7 +246,6 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                     xAxis.setHeight(info.getTopHeight());
                     yAxis.setWidth(info.getyAxisWidth());
                     requestReMeasure();
-                    postInvalidate();
                     isNotifying.set(false);
                     //long end = System.currentTimeMillis();
                     //Log.e("smartTable","notifyDataChanged timeMillis="+(end-start));
@@ -290,10 +293,16 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
 
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+//        postInvalidate();
+    }
+
     /**
      * 通知重新测量大小
      */
-    private void requestReMeasure() {
+    protected void requestReMeasure() {
         //不是精准模式 且已经测量了
         if (!isExactly && getMeasuredHeight() != 0 && tableData != null) {
             if (tableData.getTableInfo().getTableRect() != null) {
@@ -627,5 +636,37 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     public void setYSequenceRight(boolean YSequenceRight) {
         isYSequenceRight = YSequenceRight;
     }
+
+
+    public int[] getPointLocation(double row,double col){
+        if(tableData == null)return null;
+        Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,tableData.getTableInfo());
+        List<Column> childColumns = tableData.getChildColumns();
+        int[] lineHeights =  tableData.getTableInfo().getLineHeightArray();
+        int x=0,y =0;
+        int columnSize = childColumns.size();
+        for(int i = 0; i <= (columnSize > col+1 ? col+1 : columnSize-1);i++){
+            int w = childColumns.get(i).getComputeWidth();
+            if(i == (int)col+1){
+                x +=w *(col-(int)col);
+            }else {
+                x += w;
+            }
+        }
+        for(int i = 0; i <= (lineHeights.length > row+1 ? row+1 : lineHeights.length-1);i++){
+            int h = lineHeights[i];
+            if(i == (int)row+1){
+                y +=h *(row-(int)row);
+            }else {
+                y += h;
+            }
+        }
+        x *= config.getZoom();
+        y *= config.getZoom();
+        x += scaleRect.left;
+        y +=scaleRect.top;
+        return new int[]{x,y};
+    }
+
 }
 

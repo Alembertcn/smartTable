@@ -15,6 +15,7 @@ import com.bin.david.form.listener.OnColumnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,9 +73,9 @@ public class TableData<T> {
         this.columns = columns;
         this.t = t;
         tableInfo.setLineSize(t.size());
-        childColumns = new ArrayList<>();
-        columnInfos = new ArrayList<>();
-        childColumnInfos = new ArrayList<>();
+        childColumns = Collections.synchronizedList(new ArrayList<>());
+        columnInfos = Collections.synchronizedList(new ArrayList<>());
+        childColumnInfos = Collections.synchronizedList(new ArrayList<>());
         //cellRangeAddresses = new ArrayList<>();
         this.titleDrawFormat = titleDrawFormat == null?new TitleDrawFormat() :titleDrawFormat;
     }

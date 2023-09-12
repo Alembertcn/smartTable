@@ -28,8 +28,6 @@ import java.util.List;
  */
 
 public class TableProvider<T> implements TableClickObserver {
-
-
     private Rect scaleRect;
     private Rect showRect;
     private TableConfig config;
@@ -477,6 +475,7 @@ public class TableProvider<T> implements TableClickObserver {
      * @return
      */
     public int[] getPointLocation(double row,double col){
+        if(tableData == null)return null;
         List<Column> childColumns = tableData.getChildColumns();
         int[] lineHeights =  tableData.getTableInfo().getLineHeightArray();
         int x=0,y =0;
@@ -502,7 +501,6 @@ public class TableProvider<T> implements TableClickObserver {
         x += scaleRect.left;
         y +=scaleRect.top;
         return new int[]{x,y};
-
     }
     /**
      * 计算任何point在View的大小
@@ -520,6 +518,11 @@ public class TableProvider<T> implements TableClickObserver {
         return new int[]{(int) (childColumns.get(col).getComputeWidth()*config.getZoom()),
                 (int) (lineHeights[row]*config.getZoom())};
 
+    }
+
+
+    public Rect getScaleRect() {
+        return scaleRect;
     }
 
     /**
