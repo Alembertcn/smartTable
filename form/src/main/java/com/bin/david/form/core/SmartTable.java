@@ -330,7 +330,6 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                             requestLayout();
                         }
                     });
-
                 }
             }
         }
@@ -639,7 +638,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
 
 
     public int[] getPointLocation(double row,double col){
-        if(tableData == null)return null;
+        if(tableData == null||row<0||row>=tableData.getT().size())return null;
         Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,tableData.getTableInfo());
         List<Column> childColumns = tableData.getChildColumns();
         int[] lineHeights =  tableData.getTableInfo().getLineHeightArray();

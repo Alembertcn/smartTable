@@ -155,7 +155,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
      * 通过该方法可以判断是否继续拦截滑动事件
      * @return 是否到左边界
      */
-    private boolean toRectLeft() {
+    protected boolean toRectLeft() {
         return translateX <= 0;
     }
 
@@ -163,7 +163,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
      * 通过translateX值判断是否到右边界
      * @return 是否到右边界
      */
-    private boolean toRectRight() {
+    protected boolean toRectRight() {
         return translateX >= zoomRect.width() -originalRect.width();
     }
     /**

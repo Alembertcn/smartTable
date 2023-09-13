@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 
 import com.bin.david.form.core.TableConfig;
+import com.bin.david.form.data.Cell;
 import com.bin.david.form.data.CellInfo;
 import com.bin.david.form.data.column.Column;
 import com.bin.david.form.data.column.ColumnInfo;
@@ -325,14 +326,28 @@ public class TableProvider<T> implements TableClickObserver {
                     if (correctCellRect != null) {
                     if (correctCellRect.top < showRect.bottom) {
                         if (correctCellRect.right > showRect.left && correctCellRect.bottom > showRect.top) {
-                            Object data = column.getDatas().get(j);
+                                Object data = column.getDatas().get(j);
                                 if (DrawUtils.isClick(correctCellRect, clickPoint)) {
                                     operation.setSelectionRect(i, j, correctCellRect);
                                     tipPoint.x = (left + right) / 2;
                                     tipPoint.y = (top + bottom) / 2;
                                     tipColumn = column;
                                     tipPosition = j;
-                                    clickColumn(column, j, value, data);
+                                    Cell[][] rangeCells = tableInfo.getRangeCells();
+                                    if(rangeCells!=null && rangeCells.length>j && rangeCells[j][i] !=null && rangeCells[j][i].row>1){
+                                        Rect tem = new Rect();
+                                        tem.set((int) left, (int) top, (int) right, (int) bottom);
+                                        for (int temRowJump = 0; temRowJump< rangeCells[j][i].row; temRowJump++){
+                                            if(DrawUtils.isClick(tem, clickPoint)){
+                                                clickColumn(column, j+temRowJump, value, data);
+                                                break;
+                                            }
+                                            tem.top+= info.getLineHeightArray()[realPosition+temRowJump];
+                                            tem.bottom+=info.getLineHeightArray()[realPosition+temRowJump];
+                                        }
+                                    }else{
+                                        clickColumn(column, j, value, data);
+                                    }
                                     isClickPoint = true;
                                     clickPoint.set(-Integer.MAX_VALUE, -Integer.MAX_VALUE);
                                 }

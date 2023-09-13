@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
@@ -103,7 +104,7 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
                 int screenHeight = dm.heightPixels;
                 int maxWidth = screenWidth - realSize[0];
                 int maxHeight = screenHeight - realSize[1];
-                defaultHeight = Math.max(defaultHeight, maxHeight);
+//                defaultHeight = Math.max(defaultHeight, maxHeight);
                 defaultWidth = Math.min(defaultWidth, maxWidth);
                 //Log.e("SmartTable","old defaultHeight"+this.defaultHeight+"defaultWidth"+this.defaultWidth);
                 if (this.defaultHeight != defaultHeight
@@ -117,7 +118,13 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
                             requestLayout();
                         }
                     });
-
+                }else {
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            performJump();
+                        }
+                    },20);
                 }
             }
         }
@@ -130,7 +137,7 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
         performJump();
     }
 
-    public void performJump(){
+    private void performJump(){
         boolean ifJump = shouldJump.get();
         if(ifJump){
             shouldJump.set(false);
@@ -139,11 +146,21 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
         }
 
         int[] pointLocation = getPointLocation(currentRow,1);
+        int[] pointLocation2 = getPointLocation(currentRow-1,1);
+        int itemHeight =0;
+        if(pointLocation==null || pointLocation2 == null){
+            itemHeight = 0;
+        }else{
+            itemHeight = pointLocation[1] - pointLocation2[1];
+        }
         Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,
                 tableData.getTableInfo());
         if(pointLocation!=null && scrollView!=null){
-            int top =scaleRect==null ? 0 : scaleRect.top;
-            int y = pointLocation[1] - top;
+            int top = scaleRect==null ? 0 : scaleRect.top;
+            int scrollViewHeight = scrollView.getHeight();
+            int y = pointLocation[1] - top - ((toCenter?(scrollViewHeight/2 - itemHeight -40):0));
+            y = Math.min(y, getMeasuredHeight()- scrollViewHeight);//这里判断的有待商榷
+            y = Math.max(0, y);
             matrixHelper.setTranslateY(y);
             scrollView.setScrollY(y);
             postInvalidate();
@@ -161,23 +178,6 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
         public MatrixHelper2(Context context) {
             super(context);
             mGestureDetector = new GestureDetector(getContext(), new OnTableGestureListener2());
-        }
-
-        @Override
-        public void onDisallowInterceptEvent(View view, MotionEvent event) {
-            super.onDisallowInterceptEvent(view, event);
-            ViewParent parent = view.getParent();
-            if (zoomRect == null || originalRect == null) {
-                parent.requestDisallowInterceptTouchEvent(false);
-                return;
-            }
-            if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                float disX = event.getX() - mDownX;
-                float disY = event.getY() - mDownY;
-                if (Math.abs(disX) > Math.abs(disY)) {
-                    parent.requestDisallowInterceptTouchEvent(true);
-                }
-            }
         }
 
         protected boolean toRectTop() {
@@ -205,7 +205,13 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
     int currentRow;
 
     public void setCurrentRow(int currentRow){
+       setCurrentRow(currentRow,true);
+    }
+
+    boolean toCenter;
+    public void setCurrentRow(int currentRow,boolean toCenter){
         Log.d("testSmartTable", "setCurrentRow " + currentRow);
+        this.toCenter = toCenter;
         this.currentRow = currentRow;
     }
 
