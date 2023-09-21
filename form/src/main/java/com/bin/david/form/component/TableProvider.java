@@ -308,7 +308,6 @@ public class TableProvider<T> implements TableClickObserver {
                clipCount++;
             }
             float right = left + width;
-
             if (left < showRect.right) {
                 int size = column.getDatas().size();
                 int realPosition = 0;

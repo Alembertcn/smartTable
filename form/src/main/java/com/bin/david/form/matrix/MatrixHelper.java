@@ -34,7 +34,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
 
     private  float maxZoom = 5;
     private  float minZoom = 1;
-    private float zoom = minZoom; //缩放比例  不得小于1
+    protected float zoom = minZoom; //缩放比例  不得小于1
     protected int translateX; //以左上角为准，X轴位移的距离
     protected int translateY;//以左上角为准，y轴位移的距离
     private ScaleGestureDetector mScaleGestureDetector;
@@ -50,9 +50,9 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
     private boolean isFling;
     private OnTableChangeListener listener;
     private float flingRate = 1f; //速率
-    private Rect scaleRect = new Rect();
-    private boolean isZooming; //是否正在缩放
-    private boolean isAutoFling = false;
+    protected Rect scaleRect = new Rect();
+    protected boolean isZooming; //是否正在缩放
+    protected boolean isAutoFling = false;
     private OnInterceptListener onInterceptListener;
     int touchSlop; //最小滚动距离
 
@@ -61,14 +61,18 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
      * @param context 用于获取GestureDetector，scroller ViewConfiguration
      */
     public MatrixHelper(Context context) {
-        mScaleGestureDetector = new ScaleGestureDetector(context, this);
-        mGestureDetector = new GestureDetector(context, new OnTableGestureListener());
+        initGesture(context);
         final ViewConfiguration configuration = ViewConfiguration.get(context);
         touchSlop = configuration.getScaledTouchSlop();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         scroller = new Scroller(context);
         zoomRect = new Rect();
         originalRect = new Rect();
+    }
+
+    protected void initGesture(Context context) {
+        mScaleGestureDetector = new ScaleGestureDetector(context, this);
+        mGestureDetector = new GestureDetector(context, new OnTableGestureListener());
     }
 
     /**
@@ -217,7 +221,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
     /**
      * 手势监听
      */
-    protected class OnTableGestureListener extends GestureDetector.SimpleOnGestureListener {
+    public class OnTableGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public void onLongPress(MotionEvent e) {
@@ -227,7 +231,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if(onInterceptListener ==null || !onInterceptListener.isIntercept(e1,distanceX,distanceY)){
-Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
+                Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
                 translateX += distanceX;
                 translateY += distanceY;
                 notifyViewChanged();
@@ -473,7 +477,10 @@ Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
                     translateX = minTranslateX;
                 }
             }
+            Log.d("testHeight", "isFullShowY "+isFullShowY);
+
             if (isFullShowY) {
+                Log.d("testHeight", "isFullShowY "+isFullShowY);
                 if (isZooming) {
                     scaleRect.top = scaleRect.top < showRect.top ? showRect.top : scaleRect.top;
                     scaleRect.top = scaleRect.top > showRect.bottom - newHeight ? showRect.bottom - newHeight : scaleRect.top;

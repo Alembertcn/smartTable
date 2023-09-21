@@ -1,7 +1,6 @@
 package com.bin.david.form.component;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -10,13 +9,11 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
 
 import com.bin.david.form.core.SmartTable;
+import com.bin.david.form.data.TableInfo;
 import com.bin.david.form.matrix.MatrixHelper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,7 +76,7 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
         super.initShowRect();
         getLocalVisibleRect(showRect);
         showRect.set(
-                getPaddingLeft(), showRect.top,
+                showRect.left+getPaddingLeft(), showRect.top,
                 getWidth() - getPaddingRight(),
                 showRect.bottom
         );
@@ -170,6 +167,12 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
     AtomicBoolean shouldJump=new AtomicBoolean(false);
 
     class MatrixHelper2 extends MatrixHelper {
+        @Override
+        protected void initGesture(Context context) {
+            super.initGesture(context);
+            mGestureDetector = new GestureDetector(context, new OnTableGestureListener2());
+        }
+
         /**
          * 手势帮助类构造方法
          *
@@ -177,7 +180,6 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
          */
         public MatrixHelper2(Context context) {
             super(context);
-            mGestureDetector = new GestureDetector(getContext(), new OnTableGestureListener2());
         }
 
         protected boolean toRectTop() {
@@ -191,13 +193,12 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
         class OnTableGestureListener2 extends OnTableGestureListener {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                Log.d("testScroll", "OnTableGestureListener2 distanceX:" + distanceX + " distanceY:" + distanceY);
                 return super.onScroll(e1, e2, distanceX, 0f);
             }
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                return super.onFling(e1, e2, velocityX, 0);
+              return super.onFling(e1, e2, velocityX, 0);
             }
         }
     }

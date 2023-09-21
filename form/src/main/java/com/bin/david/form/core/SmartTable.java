@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -247,8 +248,6 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                     yAxis.setWidth(info.getyAxisWidth());
                     requestReMeasure();
                     isNotifying.set(false);
-                    //long end = System.currentTimeMillis();
-                    //Log.e("smartTable","notifyDataChanged timeMillis="+(end-start));
                 }
 
             }).start();
@@ -318,12 +317,10 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                 int maxHeight = screenHeight - realSize[1];
                 defaultHeight = Math.min(defaultHeight, maxHeight);
                 defaultWidth = Math.min(defaultWidth, maxWidth);
-                //Log.e("SmartTable","old defaultHeight"+this.defaultHeight+"defaultWidth"+this.defaultWidth);
                 if (this.defaultHeight != defaultHeight
                         || this.defaultWidth != defaultWidth) {
                     this.defaultHeight = defaultHeight;
                     this.defaultWidth = defaultWidth;
-                    // Log.e("SmartTable","new defaultHeight"+defaultHeight+"defaultWidth"+defaultWidth);
                     post(new Runnable() {
                         @Override
                         public void run() {
