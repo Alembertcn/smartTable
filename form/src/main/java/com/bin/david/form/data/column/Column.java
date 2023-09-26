@@ -3,6 +3,7 @@ package com.bin.david.form.data.column;
 import android.graphics.Paint;
 
 import com.bin.david.form.data.TableInfo;
+import com.bin.david.form.data.format.IFormat2;
 import com.bin.david.form.data.format.count.DecimalCountFormat;
 import com.bin.david.form.data.format.count.ICountFormat;
 import com.bin.david.form.data.format.count.NumberCountFormat;
@@ -38,6 +39,7 @@ public class Column<T> implements Comparable<Column> {
     private List<Column> children;
 
     private IFormat<T> format;
+
     private IDrawFormat<T> drawFormat;
     private String fieldName;
     private List<T> datas;
@@ -359,7 +361,16 @@ public class Column<T> implements Comparable<Column> {
 
     public String format(int position){
        if(position >=0 && position< datas.size()){
-          return format(datas.get(position));
+            T t =datas.get(position);
+           String value;
+           if(format instanceof IFormat2){
+               value = ((IFormat2) format).format(this,position);
+           }else if (format != null) {
+               value = format.format(t);
+           } else {
+               value = t == null ? INVAL_VALUE : t.toString();
+           }
+           return value;
        }
        return INVAL_VALUE;
     }
@@ -377,7 +388,7 @@ public class Column<T> implements Comparable<Column> {
             int rangeStartPosition= -1;
             int rangeCount = 1;
             for (int i = 0; i < size; i++) {
-                String val = format(datas.get(i));
+                String val = format(i);
                 if(rangeCount < maxMergeCount && perVal !=null && val !=null
                         && val.length() != 0 && val.equals(perVal)){
                     if(rangeStartPosition ==-1){
