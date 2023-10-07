@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.util.Log;
 
 import com.bin.david.form.core.TableConfig;
 import com.bin.david.form.data.Cell;
@@ -49,6 +50,10 @@ public class TableProvider<T> implements TableClickObserver {
     private GridDrawer<T> gridDrawer;
     private PointF tipPoint = new PointF();
     private IDrawOver drawOver;
+
+    private int firstVisibleRow;//第一行可见
+    private int lastVisibleRow;//最后一行可见
+
     private CellInfo cellInfo = new CellInfo();
 
     public TableProvider() {
@@ -287,6 +292,7 @@ public class TableProvider<T> implements TableClickObserver {
         int clipCount = 0;
         Rect correctCellRect;
         TableInfo tableInfo = tableData.getTableInfo();
+        int firstVisible=Integer.MAX_VALUE,lastVisible=Integer.MIN_VALUE;
         for (int i = 0; i < columnSize; i++) {
             top = scaleRect.top;
             Column column = columns.get(i);
@@ -325,34 +331,36 @@ public class TableProvider<T> implements TableClickObserver {
                     if (correctCellRect != null) {
                     if (correctCellRect.top < showRect.bottom) {
                         if (correctCellRect.right > showRect.left && correctCellRect.bottom > showRect.top) {
-                                Object data = column.getDatas().get(j);
-                                if (DrawUtils.isClick(correctCellRect, clickPoint)) {
-                                    operation.setSelectionRect(i, j, correctCellRect);
-                                    tipPoint.x = (left + right) / 2;
-                                    tipPoint.y = (top + bottom) / 2;
-                                    tipColumn = column;
-                                    tipPosition = j;
-                                    Cell[][] rangeCells = tableInfo.getRangeCells();
-                                    if(rangeCells!=null && rangeCells.length>j && rangeCells[j][i] !=null && rangeCells[j][i].row>1){
-                                        Rect tem = new Rect();
-                                        tem.set((int) left, (int) top, (int) right, (int) bottom);
-                                        for (int temRowJump = 0; temRowJump< rangeCells[j][i].row; temRowJump++){
-                                            if(DrawUtils.isClick(tem, clickPoint)){
-                                                clickColumn(column, j+temRowJump, value, data);
-                                                break;
-                                            }
-                                            tem.top+= info.getLineHeightArray()[realPosition+temRowJump];
-                                            tem.bottom+=info.getLineHeightArray()[realPosition+temRowJump];
+                            firstVisible = firstVisible > j ? j : firstVisible;
+                            lastVisible = lastVisible < j ? j : lastVisible;
+                            Object data = column.getDatas().get(j);
+                            if (DrawUtils.isClick(correctCellRect, clickPoint)) {
+                                operation.setSelectionRect(i, j, correctCellRect);
+                                tipPoint.x = (left + right) / 2;
+                                tipPoint.y = (top + bottom) / 2;
+                                tipColumn = column;
+                                tipPosition = j;
+                                Cell[][] rangeCells = tableInfo.getRangeCells();
+                                if(rangeCells!=null && rangeCells.length>j && rangeCells[j][i] !=null && rangeCells[j][i].row>1){
+                                    Rect tem = new Rect();
+                                    tem.set((int) left, (int) top, (int) right, (int) bottom);
+                                    for (int temRowJump = 0; temRowJump< rangeCells[j][i].row; temRowJump++){
+                                        if(DrawUtils.isClick(tem, clickPoint)){
+                                            clickColumn(column, j+temRowJump, value, data);
+                                            break;
                                         }
-                                    }else{
-                                        clickColumn(column, j, value, data);
+                                        tem.top+= info.getLineHeightArray()[realPosition+temRowJump];
+                                        tem.bottom+=info.getLineHeightArray()[realPosition+temRowJump];
                                     }
-                                    isClickPoint = true;
-                                    clickPoint.set(-Integer.MAX_VALUE, -Integer.MAX_VALUE);
+                                }else{
+                                    clickColumn(column, j, value, data);
                                 }
-                                operation.checkSelectedPoint(i, j, correctCellRect);
-                                cellInfo.set(column,data,value,i,j);
-                                drawContentCell(canvas,cellInfo,correctCellRect,config);
+                                isClickPoint = true;
+                                clickPoint.set(-Integer.MAX_VALUE, -Integer.MAX_VALUE);
+                            }
+                            operation.checkSelectedPoint(i, j, correctCellRect);
+                            cellInfo.set(column,data,value,i,j);
+                            drawContentCell(canvas,cellInfo,correctCellRect,config);
 
                             }
                         } else {
@@ -372,6 +380,8 @@ public class TableProvider<T> implements TableClickObserver {
         if (config.isFixedCountRow()) {
             canvas.restore();
         }
+        firstVisibleRow = firstVisible;
+        lastVisibleRow = lastVisible;
     }
 
     /**
@@ -550,4 +560,11 @@ public class TableProvider<T> implements TableClickObserver {
         return operation;
     }
 
+    public int getFirstVisibleRow() {
+        return firstVisibleRow;
+    }
+
+    public int getLastVisibleRow() {
+        return lastVisibleRow;
+    }
 }

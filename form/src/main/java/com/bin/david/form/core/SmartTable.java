@@ -99,6 +99,13 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
 
     }
 
+    public int getFirstVisibleRow(){
+        return provider.getFirstVisibleRow();
+    }
+
+    public int getLastVisibleRow(){
+        return provider.getLastVisibleRow();
+    }
     protected MatrixHelper createMatrixHelper() {
         return new MatrixHelper(getContext());
     }
