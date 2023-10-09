@@ -210,11 +210,24 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      * @param data 表格数据
      */
     public PageTableData<T> setData(List<T> data) {
+       return setData(data, null);
+    }
+
+    /**
+     * 设置解析数据
+     *
+     * @param data 表格数据
+     * @param onGenerateData 生成数据notify前的监听
+     */
+    public PageTableData<T> setData(List<T> data,OnGenerateData onGenerateData) {
         if (annotationParser == null) {
             annotationParser = new AnnotationParser<>(config.dp10,getContext());
         }
         PageTableData<T> tableData = annotationParser.parse(data);
         if (tableData != null) {
+            if(onGenerateData!=null){
+                onGenerateData.onGenerateData(tableData);
+            }
             setTableData(tableData);
         }
         return tableData;
@@ -688,6 +701,10 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         x += scaleRect.left;
         y +=scaleRect.top;
         return new int[]{x,y};
+    }
+
+    public interface OnGenerateData<T>{
+        void onGenerateData(PageTableData<T> data);
     }
 }
 
