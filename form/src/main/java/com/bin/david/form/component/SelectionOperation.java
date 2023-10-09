@@ -23,14 +23,21 @@ public class SelectionOperation implements MatrixHelper.OnInterceptListener {
      * 选中区域
      */
     private static final int INVALID = -1; //无效坐标
+    public static final int SELECT_MODE_ITEM=0;
+    public static final int SELECT_MODE_ROW=1;
+    private int selectMode = SELECT_MODE_ITEM;//选中模式
+
     private Rect selectionRect;
     private ISelectFormat selectFormat;
     private int selectRow = INVALID;
     private int selectColumn = INVALID;
     private boolean isShow;
 
+    OnSelectListener onSelectListener;
+
     void reset(){
         isShow = false;
+        setSelectionRect(INVALID,INVALID,null);
     }
 
     SelectionOperation() {
@@ -40,26 +47,28 @@ public class SelectionOperation implements MatrixHelper.OnInterceptListener {
     void setSelectionRect(int selectColumn,int selectRow, Rect rect){
         this.selectRow = selectRow;
         this.selectColumn = selectColumn;
-        selectionRect.set(rect);
-        isShow = true;
+        if(rect != null){
+            selectionRect.set(rect);
+        }else{
+            selectionRect.set(0,0,0,0);
+        }
+        isShow = selectColumn!=INVALID && selectRow !=INVALID && rect!=null;
+        if(onSelectListener!=null){
+            onSelectListener.onSelectChange(isShow,selectRow,selectColumn);
+        }
     }
 
     boolean isSelectedPoint( int selectColumn,int selectRow){
-
-       return  selectRow == this.selectRow  && selectColumn == this.selectColumn;
+       return  selectRow == this.selectRow  && (selectMode == SELECT_MODE_ROW || selectColumn == this.selectColumn);
     }
 
     void checkSelectedPoint(int selectColumn,int selectRow, Rect rect){
 
          if(isSelectedPoint(selectColumn,selectRow)){
-
              selectionRect.set(rect);
              isShow = true;
          }
     }
-
-
-
 
 
     public void draw(Canvas canvas, Rect showRect, TableConfig config){
@@ -83,4 +92,19 @@ public class SelectionOperation implements MatrixHelper.OnInterceptListener {
     }
 
 
+    public int getSelectMode() {
+        return selectMode;
+    }
+
+    public void setSelectMode(int selectMode) {
+        this.selectMode = selectMode;
+    }
+
+    public void setOnSelectListener(OnSelectListener onSelectListener) {
+        this.onSelectListener = onSelectListener;
+    }
+
+    public interface OnSelectListener{
+        void onSelectChange(boolean isSelect,int selectRow,int selectColumn);
+    }
 }

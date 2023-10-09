@@ -13,6 +13,7 @@ import android.view.View;
 
 import com.bin.david.form.component.IComponent;
 import com.bin.david.form.component.ITableTitle;
+import com.bin.david.form.component.SelectionOperation;
 import com.bin.david.form.component.TableProvider;
 import com.bin.david.form.component.TableTitle;
 import com.bin.david.form.component.XSequence;
@@ -30,6 +31,7 @@ import com.bin.david.form.utils.DensityUtils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 
 /**
@@ -255,6 +257,8 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                     yAxis.setWidth(info.getyAxisWidth());
                     requestReMeasure();
                     isNotifying.set(false);
+//                    TODO: 重置provider的 tipColumn clickColumnInfo operation
+                    provider.reset();
                 }
 
             }).start();
@@ -531,6 +535,22 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         this.provider.setSelectFormat(selectFormat);
     }
 
+    /**
+     * 设置选中模式
+     *
+     * @param model 选中格子格式化
+     */
+    public void setSelectMode(int model) {
+        this.provider.getOperation().setSelectMode(model);
+    }
+    /**
+     * 设置选中监听
+     *
+     * @param listener 选中格子格式化
+     */
+    public void setSelectListener(SelectionOperation.OnSelectListener listener) {
+        this.provider.getOperation().setOnSelectListener(listener);
+    }
 
     @Override
     public int computeHorizontalScrollRange() {
@@ -621,7 +641,6 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         matrixHelper.unRegisterAll();
         annotationParser = null;
         measurer = null;
-        provider = null;
         matrixHelper = null;
         provider = null;
         if (tableData != null) {
@@ -670,6 +689,5 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         y +=scaleRect.top;
         return new int[]{x,y};
     }
-
 }
 

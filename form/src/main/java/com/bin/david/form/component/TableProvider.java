@@ -45,6 +45,8 @@ public class TableProvider<T> implements TableClickObserver {
     private ITip<Column, ?> tip;
     private Rect clipRect;
     private Rect tempRect; //用于存储数据
+    private Rect tempRect2; //用于存储数据
+
     private Column tipColumn;
     private int tipPosition;
     private GridDrawer<T> gridDrawer;
@@ -61,6 +63,7 @@ public class TableProvider<T> implements TableClickObserver {
         clickPoint = new PointF(-1, -1);
         clipRect = new Rect();
         tempRect  = new Rect();
+        tempRect2 = new Rect();
         operation = new SelectionOperation();
         gridDrawer  = new GridDrawer<>();
     }
@@ -81,16 +84,17 @@ public class TableProvider<T> implements TableClickObserver {
         drawColumnTitle(canvas, config);
         drawCount(canvas);
         drawContent(canvas);
+        if(drawOver !=null)drawOver.draw(canvas,scaleRect,showRect,config);
+
         operation.draw(canvas,showRect,config);
-        if(drawOver !=null)
-            drawOver.draw(canvas,scaleRect,showRect,config);
-        canvas.restore();
+
         if (isClickPoint && clickColumnInfo != null) {
             onColumnClickListener.onClick(clickColumnInfo);
         }
         if (tipColumn != null) {
             drawTip(canvas, tipPoint.x, tipPoint.y, tipColumn, tipPosition);
         }
+        canvas.restore();
     }
 
     /**
@@ -103,8 +107,6 @@ public class TableProvider<T> implements TableClickObserver {
     private void setData(Rect scaleRect, Rect showRect, TableData<T> tableData, TableConfig config) {
         isClickPoint = false;
         clickColumnInfo = null;
-        tipColumn = null;
-        operation.reset();
         this.scaleRect = scaleRect;
         this.showRect = showRect;
         this.config = config;
@@ -290,7 +292,6 @@ public class TableProvider<T> implements TableClickObserver {
         List<ColumnInfo> childColumnInfo = tableData.getChildColumnInfos();
         boolean isPerFixed = false;
         int clipCount = 0;
-        Rect correctCellRect;
         TableInfo tableInfo = tableData.getTableInfo();
         int firstVisible=Integer.MAX_VALUE,lastVisible=Integer.MIN_VALUE;
         for (int i = 0; i < columnSize; i++) {
@@ -302,7 +303,7 @@ public class TableProvider<T> implements TableClickObserver {
             Column topColumn = childColumnInfo.get(i).getTopParent().column;
             if (topColumn.isFixed()) {
                 isPerFixed = false;
-                if(tempLeft < clipRect.left){
+                if(tempLeft <= clipRect.left){
                     left = clipRect.left;
                     clipRect.left +=width;
                     isPerFixed = true;
@@ -327,30 +328,38 @@ public class TableProvider<T> implements TableClickObserver {
                     realPosition+=skip;
                     float bottom = top + totalLineHeight*config.getZoom();
                     tempRect.set((int) left, (int) top, (int) right, (int) bottom);
-                    correctCellRect = gridDrawer.correctCellRect(j, i, tempRect, config.getZoom()); //矫正格子的大小
-                    if (correctCellRect != null) {
-                    if (correctCellRect.top < showRect.bottom) {
-                        if (correctCellRect.right > showRect.left && correctCellRect.bottom > showRect.top) {
+                    //矫正格子的大小 当前cell的格子区域就是temRect 绘制期间不改动
+                    if (gridDrawer.correctCellRect(j, i, tempRect, config.getZoom()) != null) {
+                    if (tempRect.top < showRect.bottom) {
+                        if (tempRect.right > showRect.left && tempRect.bottom > showRect.top) {
                             firstVisible = firstVisible > j ? j : firstVisible;
                             lastVisible = lastVisible < j ? j : lastVisible;
                             Object data = column.getDatas().get(j);
-                            if (DrawUtils.isClick(correctCellRect, clickPoint)) {
-                                operation.setSelectionRect(i, j, correctCellRect);
+                            //防止点击遮盖部份和悬浮列
+                            if (tempRect2.setIntersect(tempRect,clipRect) && !topColumn.isFixed() && DrawUtils.isClick(tempRect2, clickPoint)) { //悬浮列不支持点击和选中
+                                if(operation.isSelectedPoint(i,j)){
+                                    operation.reset();
+                                }else{
+                                    Cell cell = (info.getRangeCells()!=null && info.getRangeCells().length>j && info.getRangeCells()[j][0]==null) ?null: info.getRangeCells()[j][0].realCell;
+                                    int temLeft =cell==null?0: cell.row>1? columns.get(0).getComputeWidth():0;
+                                    Rect rect =  operation.getSelectMode() == SelectionOperation.SELECT_MODE_ROW ? new Rect(showRect.left + temLeft, tempRect.top, showRect.right, tempRect.bottom) : tempRect;
+                                    operation.setSelectionRect(i, j, rect);
+                                }
                                 tipPoint.x = (left + right) / 2;
                                 tipPoint.y = (top + bottom) / 2;
-                                tipColumn = column;
+                                tipColumn = tipColumn ==column ? null:column;
                                 tipPosition = j;
+                                //区分出点击合并区域的那一部份
                                 Cell[][] rangeCells = tableInfo.getRangeCells();
                                 if(rangeCells!=null && rangeCells.length>j && rangeCells[j][i] !=null && rangeCells[j][i].row>1){
-                                    Rect tem = new Rect();
-                                    tem.set((int) left, (int) top, (int) right, (int) bottom);
+                                    tempRect2.set((int) left, (int) top, (int) right, (int) bottom);
                                     for (int temRowJump = 0; temRowJump< rangeCells[j][i].row; temRowJump++){
-                                        if(DrawUtils.isClick(tem, clickPoint)){
+                                        if(DrawUtils.isClick(tempRect2, clickPoint)){
                                             clickColumn(column, j+temRowJump, value, data);
                                             break;
                                         }
-                                        tem.top+= info.getLineHeightArray()[realPosition+temRowJump];
-                                        tem.bottom+=info.getLineHeightArray()[realPosition+temRowJump];
+                                        tempRect2.top+= info.getLineHeightArray()[realPosition+temRowJump];
+                                        tempRect2.bottom+=info.getLineHeightArray()[realPosition+temRowJump];
                                     }
                                 }else{
                                     clickColumn(column, j, value, data);
@@ -358,10 +367,9 @@ public class TableProvider<T> implements TableClickObserver {
                                 isClickPoint = true;
                                 clickPoint.set(-Integer.MAX_VALUE, -Integer.MAX_VALUE);
                             }
-                            operation.checkSelectedPoint(i, j, correctCellRect);
-                            cellInfo.set(column,data,value,i,j);
-                            drawContentCell(canvas,cellInfo,correctCellRect,config);
 
+                            cellInfo.set(column,data,value,i,j);
+                            drawContentCell(canvas,cellInfo,tempRect,config);
                             }
                         } else {
                             break;
@@ -566,5 +574,13 @@ public class TableProvider<T> implements TableClickObserver {
 
     public int getLastVisibleRow() {
         return lastVisibleRow;
+    }
+
+    public void reset() {
+        isClickPoint = false;
+        clickPoint.set(-1,-1);
+        clickColumnInfo = null;
+        tipColumn = null;
+        operation.reset();
     }
 }

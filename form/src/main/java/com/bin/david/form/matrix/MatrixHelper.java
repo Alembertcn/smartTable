@@ -231,7 +231,6 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if(onInterceptListener ==null || !onInterceptListener.isIntercept(e1,distanceX,distanceY)){
-                Log.d("testScroll","onScroll distanceX:"+distanceX+" distanceY:"+distanceY);
                 translateX += distanceX;
                 translateY += distanceY;
                 notifyViewChanged();

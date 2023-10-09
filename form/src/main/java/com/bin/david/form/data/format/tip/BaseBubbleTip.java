@@ -50,8 +50,8 @@ public abstract class BaseBubbleTip<C,S> implements ITip<C,S>{
     public void drawTip(Canvas canvas, float x, float y, Rect rect,C c,int position) {
         if(isShowTip(c,position)) {
             S content = format(c,position);
-            int triangleWidth = triangleBitmap.getWidth();
-            int triangleHeight = triangleBitmap.getHeight();
+            int triangleWidth =triangleBitmap==null?0: triangleBitmap.getWidth();
+            int triangleHeight =triangleBitmap==null?0: triangleBitmap.getHeight();
             int textWidth = getTextWidth(content);
             int textHeight = getTextHeight(content);
             int w = textWidth + padding * 2;
@@ -90,9 +90,10 @@ public abstract class BaseBubbleTip<C,S> implements ITip<C,S>{
 
     private void showTop(Canvas canvas, float x, float y, S content, int textWidth, int textHeight,int tranX) {
         canvas.save();
-        int triangleWidth = triangleBitmap.getWidth();
-        int triangleHeight = triangleBitmap.getHeight();
+        int triangleWidth =triangleBitmap==null?0: triangleBitmap.getWidth();
+        int triangleHeight =triangleBitmap==null?0: triangleBitmap.getHeight();
         startColorFilter();
+        if(triangleBitmap!=null)
         canvas.drawBitmap(triangleBitmap,x-triangleWidth/2,
                 y-triangleHeight,paint);
         canvas.translate(tranX,0);
@@ -104,10 +105,11 @@ public abstract class BaseBubbleTip<C,S> implements ITip<C,S>{
 
     private void showBottom(Canvas canvas, float x, float y, S content, int textWidth,int textHeight,int tranX) {
         canvas.save();
-        int triangleWidth = triangleBitmap.getWidth();
-        int triangleHeight = triangleBitmap.getHeight();
+        int triangleWidth =triangleBitmap==null?0: triangleBitmap.getWidth();
+        int triangleHeight = triangleBitmap==null?0:triangleBitmap.getHeight();
         canvas.rotate(180,x,y);
         startColorFilter();
+        if(triangleBitmap !=null)
         canvas.drawBitmap(triangleBitmap,x-triangleWidth/2,
                 y-triangleHeight,paint);
         canvas.translate(-tranX,0);

@@ -19,6 +19,7 @@ import com.bin.david.form.matrix.MatrixHelper;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FullHeightSmartTable<T> extends SmartTable<T> {
+    private OnScrollChangeListener onVerticalScrollChangeListener;
     public FullHeightSmartTable(Context context) {
         this(context, null);
     }
@@ -56,18 +57,27 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
             if (temParent instanceof ScrollView) {
                 scrollView = (ScrollView) temParent;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    scrollView.setOnScrollChangeListener(new OnScrollChangeListener() {
-                        @Override
-                        public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                            matrixHelper.setTranslateY(scrollView.getScrollY());
-                            getLocalVisibleRect(visibleRect);
-                            invalidate(visibleRect);
-                        }
-                    });
+                    scrollView.setOnScrollChangeListener(new SyncOnScrollChangeListener());
                 }
                 break;
             }
             temParent = temParent.getParent();
+        }
+    }
+
+    public void setOnVerticalScrollChangeListener(OnScrollChangeListener onVerticalScrollChangeListener) {
+        this.onVerticalScrollChangeListener = onVerticalScrollChangeListener;
+    }
+
+    class SyncOnScrollChangeListener implements  OnScrollChangeListener{
+        @Override
+        public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+            matrixHelper.setTranslateY(scrollView.getScrollY());
+            getLocalVisibleRect(visibleRect);
+            invalidate(visibleRect);
+            if(onVerticalScrollChangeListener!=null){
+                onVerticalScrollChangeListener.onScrollChange(view, i, i1, i2, i3);
+            }
         }
     }
 
