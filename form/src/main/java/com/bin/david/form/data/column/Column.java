@@ -231,6 +231,7 @@ public class Column<T> implements Comparable<Column> {
      * @throws IllegalAccessException
      */
     public T getData(Object o) throws NoSuchFieldException, IllegalAccessException {
+        if(fieldName ==null)return null;
         String[] fieldNames = fieldName.split("\\.");
         if (fieldNames.length >0) {
             Object child = o;
@@ -268,7 +269,7 @@ public class Column<T> implements Comparable<Column> {
         if(countFormat != null){
             countFormat.clearCount();
         }
-        if (objects.size() > 0) {
+        if (objects.size() > 0 && fieldName!=null) {
             String[] fieldNames = fieldName.split("\\.");
             if (fieldNames.length>  0) {
                 Field[] fields = new Field[fieldNames.length];
@@ -322,7 +323,7 @@ public class Column<T> implements Comparable<Column> {
         if(objects.size()+ startPosition == datas.size()){
             return;
         }
-        if (objects.size() > 0) {
+        if (objects.size() > 0  && fieldName!=null) {
             String[] fieldNames = fieldName.split("\\.");
             if (fieldNames.length >0) {
                 int size = objects.size();

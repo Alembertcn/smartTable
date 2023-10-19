@@ -476,10 +476,7 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
                     translateX = minTranslateX;
                 }
             }
-            Log.d("testHeight", "isFullShowY "+isFullShowY);
-
             if (isFullShowY) {
-                Log.d("testHeight", "isFullShowY "+isFullShowY);
                 if (isZooming) {
                     scaleRect.top = scaleRect.top < showRect.top ? showRect.top : scaleRect.top;
                     scaleRect.top = scaleRect.top > showRect.bottom - newHeight ? showRect.bottom - newHeight : scaleRect.top;

@@ -256,7 +256,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      */
     public void notifyDataChanged() {
 
-        if (tableData != null) {
+        if (tableData != null && !isNotifying.get()) {
             config.setPaint(paint);
             //开启线程
             isNotifying.set(true);
