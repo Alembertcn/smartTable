@@ -128,7 +128,9 @@ public class MatrixHelper extends Observable<TableClickObserver> implements ITou
                 float disX = event.getX() - mDownX;
                 float disY = event.getY() - mDownY;
                 boolean isDisallowIntercept = true;
-                if (Math.abs(disX) > Math.abs(disY)) {
+                if(disX ==0.0 && disY ==0.0){//高版本这俩可能同时为0 android13
+                    isDisallowIntercept = false;
+                }else if (Math.abs(disX) > Math.abs(disY)) {
                     if ((disX > 0 && toRectLeft()) || (disX < 0 && toRectRight())) { //向右滑动
                         isDisallowIntercept = false;
                     }
