@@ -6,7 +6,6 @@ android {
     defaultConfig {
         applicationId "com.bin.david.smarttable"
         minSdkVersion 15
-        targetSdkVersion 25
         versionCode 1
         versionName "1.8.5"
         multiDexEnabled true

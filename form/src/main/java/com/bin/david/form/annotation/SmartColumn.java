@@ -23,7 +23,7 @@ public @interface SmartColumn {
     /**
      * 名称
      */
-   int nameRes() default -1;
+   String nameRes() default "";
 
     /**
      * id 越小越在前面

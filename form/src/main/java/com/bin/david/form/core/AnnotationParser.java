@@ -101,8 +101,11 @@ public class AnnotationParser<T>  {
      */
     private void createColumn(String fieldName,Field field, List<Column> columns, Map<String, Column> parentMap, boolean isArray,boolean isThoroughArray, SmartColumn smartColumn) {
         String name = smartColumn.name();
-        if(smartColumn.nameRes()!=-1 && mContext!=null){
-            name = mContext.getResources().getString(smartColumn.nameRes());
+        if(smartColumn.nameRes()!="" && mContext!=null){
+            int strRes = mContext.getResources().getIdentifier(smartColumn.nameRes(), "string", mContext.getPackageName());
+            if(strRes>0){
+                name = mContext.getResources().getString(strRes);
+            }
         }
         int id = smartColumn.id();
         String parent = smartColumn.parent();
