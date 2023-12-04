@@ -19,6 +19,7 @@ import com.bin.david.form.component.TableTitle;
 import com.bin.david.form.component.XSequence;
 import com.bin.david.form.component.YSequence;
 import com.bin.david.form.data.column.Column;
+import com.bin.david.form.data.format.selected.IDrawOver;
 import com.bin.david.form.data.table.PageTableData;
 import com.bin.david.form.data.table.TableData;
 import com.bin.david.form.data.TableInfo;
@@ -46,6 +47,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     private ITableTitle tableTitle;
     protected TableProvider<T> provider;
     protected Rect showRect;
+    protected Rect temShowRect=new Rect();
     protected Rect tableRect;
     private TableConfig config;
     private TableParser<T> parser;
@@ -59,6 +61,12 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     protected boolean isExactly = true; //是否是测量精准模式
     protected AtomicBoolean isNotifying = new AtomicBoolean(false); //是否正在更新数据
     private boolean isYSequenceRight;
+
+    public void setDrawOver(IDrawOver drawOver) {
+        this.drawOver = drawOver;
+    }
+
+    private IDrawOver drawOver;
 
 
     public SmartTable(Context context) {
@@ -157,6 +165,8 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                         xAxis.onMeasure(scaleRect, showRect, config);
                         xAxis.onDraw(canvas, showRect, tableData, config);
                     }
+                    temShowRect.set(showRect.left,showRect.top,showRect.right,showRect.bottom);
+
                     if (isYSequenceRight) {
                         canvas.save();
                         canvas.translate(-yAxis.getWidth(), 0);
@@ -165,6 +175,9 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                     } else {
                         provider.onDraw(canvas, scaleRect, showRect, tableData, config);
                     }
+
+                    if(drawOver !=null)drawOver.draw(canvas,scaleRect,temShowRect,config);
+
                 }
             }
         }
@@ -271,7 +284,13 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                     requestReMeasure();
                     isNotifying.set(false);
 //                    TODO: 重置provider的 tipColumn clickColumnInfo operation
-                    provider.reset();
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            provider.reset();
+                            postInvalidate();
+                        }
+                    }, 0);
                 }
 
             }).start();

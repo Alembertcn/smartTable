@@ -400,7 +400,6 @@ public class TableProvider<T> implements TableClickObserver {
      * @param config 表格配置
      */
     protected void drawContentCell(Canvas c, CellInfo<T> cellInfo, Rect rect,TableConfig config) {
-
         if(config.getContentCellBackgroundFormat()!= null){
             config.getContentCellBackgroundFormat().drawBackground(c,rect,cellInfo,config.getPaint());
         }
@@ -509,6 +508,10 @@ public class TableProvider<T> implements TableClickObserver {
     public int[] getPointLocation(double row,double col){
         if(tableData == null)return null;
         List<Column> childColumns = tableData.getChildColumns();
+        if(childColumns==null || childColumns.isEmpty()){
+            return null;
+        }
+
         int[] lineHeights =  tableData.getTableInfo().getLineHeightArray();
         int x=0,y =0;
         int columnSize = childColumns.size();
@@ -542,6 +545,9 @@ public class TableProvider<T> implements TableClickObserver {
      */
     public int[] getPointSize(int row,int col){
         List<Column> childColumns = tableData.getChildColumns();
+        if(childColumns==null || childColumns.isEmpty()){
+            return null;
+        }
         int[] lineHeights =  tableData.getTableInfo().getLineHeightArray();
         col= col < childColumns.size() ? col:childColumns.size()-1;//列
         row = row< lineHeights.length ? row:lineHeights.length;//行

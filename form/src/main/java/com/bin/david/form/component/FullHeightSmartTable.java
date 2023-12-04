@@ -145,33 +145,30 @@ public class FullHeightSmartTable<T> extends SmartTable<T> {
     }
 
     private void performJump(){
-        boolean ifJump = shouldJump.get();
-        if(ifJump){
-            shouldJump.set(false);
-        }else{
-            return;
+        if(shouldJump.compareAndSet(true,false)){
+            int[] pointLocation = getPointLocation(currentRow,1);
+            int[] pointLocation2 = getPointLocation(currentRow-1,1);
+            int itemHeight =0;
+            if(pointLocation==null || pointLocation2 == null){
+                itemHeight = 0;
+            }else{
+                itemHeight = pointLocation[1] - pointLocation2[1];
+            }
+            Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,
+                    tableData.getTableInfo());
+            if(pointLocation!=null && scrollView!=null){
+                int top = scaleRect==null ? 0 : scaleRect.top;
+                int scrollViewHeight = scrollView.getHeight();
+                int y = pointLocation[1] - top - ((toCenter?(scrollViewHeight/2 - itemHeight -40):0));
+                y = Math.min(y, getMeasuredHeight()- scrollViewHeight);//这里判断的有待商榷
+                y = Math.max(0, y);
+                matrixHelper.setTranslateY(y);
+                scrollView.setScrollY(y);
+                postInvalidate();
+            }
+            currentRow = -1;//防止每次更新都自动跳转
         }
 
-        int[] pointLocation = getPointLocation(currentRow,1);
-        int[] pointLocation2 = getPointLocation(currentRow-1,1);
-        int itemHeight =0;
-        if(pointLocation==null || pointLocation2 == null){
-            itemHeight = 0;
-        }else{
-            itemHeight = pointLocation[1] - pointLocation2[1];
-        }
-        Rect scaleRect = matrixHelper.getZoomProviderRect(showRect, tableRect,
-                tableData.getTableInfo());
-        if(pointLocation!=null && scrollView!=null){
-            int top = scaleRect==null ? 0 : scaleRect.top;
-            int scrollViewHeight = scrollView.getHeight();
-            int y = pointLocation[1] - top - ((toCenter?(scrollViewHeight/2 - itemHeight -40):0));
-            y = Math.min(y, getMeasuredHeight()- scrollViewHeight);//这里判断的有待商榷
-            y = Math.max(0, y);
-            matrixHelper.setTranslateY(y);
-            scrollView.setScrollY(y);
-            postInvalidate();
-        }
     }
 
     AtomicBoolean shouldJump=new AtomicBoolean(false);

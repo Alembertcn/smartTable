@@ -18,7 +18,7 @@ public abstract class TitleImageDrawFormat extends ImageResTitleDrawFormat {
     public static final int RIGHT =2;
     public static final int BOTTOM =3;
 
-   private TitleDrawFormat textDrawFormat;
+   protected TitleDrawFormat textDrawFormat;
     private int drawPadding;
    private int direction;
    private int verticalPadding;
