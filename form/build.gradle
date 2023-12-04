@@ -26,6 +26,7 @@ android {
 // 将当前module打包发布到本地maven仓库
 // https://developer.android.com/studio/build/maven-publish-plugin?hl=zh-cn
 // https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:publications
+// ./gradlew publish
 afterEvaluate {
     publishing {
         publications {
