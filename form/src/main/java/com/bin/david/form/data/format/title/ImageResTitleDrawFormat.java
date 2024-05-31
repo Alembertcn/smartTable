@@ -13,9 +13,9 @@ import com.bin.david.form.data.column.Column;
 
 public abstract class ImageResTitleDrawFormat extends BitmapTitleDrawFormat {
 
-    private BitmapFactory.Options options = new BitmapFactory.Options();
+    protected BitmapFactory.Options options = new BitmapFactory.Options();
     //使用缓存
-    private LruCache<Integer,Bitmap> cache;
+    protected LruCache<Integer,Bitmap> cache;
 
 
     public ImageResTitleDrawFormat(int imageWidth, int imageHeight) {

@@ -1,0 +1,59 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.wbroker.widget",
+    "module": "SmartTable",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.8.3",
+      "buildId": "mbkmkx5r3jayjpjrpp5cyrpeaa"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "SmartTable-1.0.0.aar",
+          "url": "SmartTable-1.0.0.aar",
+          "size": 163834,
+          "sha512": "c5be3cad5a10cc66af201617ea67bca5733a2fe3a0de9fe7b4af7cf46cf9e39ec0e556f70165ed784967c57d71fd9035957ae00ddd230740ca6560c0e5751e8c",
+          "sha256": "b09c6f3f525154c1e972c19d4190c2a6666f7ca5deb8a74e00fce273020ad33d",
+          "sha1": "109cc35c722695c17f716b267fbeb3ad85a891e7",
+          "md5": "95c7e496684468455daa0c0e2635aab5"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "SmartTable-1.0.0.aar",
+          "url": "SmartTable-1.0.0.aar",
+          "size": 163834,
+          "sha512": "c5be3cad5a10cc66af201617ea67bca5733a2fe3a0de9fe7b4af7cf46cf9e39ec0e556f70165ed784967c57d71fd9035957ae00ddd230740ca6560c0e5751e8c",
+          "sha256": "b09c6f3f525154c1e972c19d4190c2a6666f7ca5deb8a74e00fce273020ad33d",
+          "sha1": "109cc35c722695c17f716b267fbeb3ad85a891e7",
+          "md5": "95c7e496684468455daa0c0e2635aab5"
+        }
+      ]
+    }
+  ]
+}
